@@ -11,23 +11,21 @@ st.set_page_config(
 )
 
 # --- Nama File Database (JSON) ---
-DATA_FILE = "iwak_data.json"
+# DATA_FILE = "iwak_data.json"
 
 # --- Fungsi untuk Memuat dan Menyimpan Data ---
 def load_data():
-    if not os.path.exists(DATA_FILE):
-        return {
-            "fish_types": [],
-            "mutation_types": []
-        }
-    with open(DATA_FILE, "r") as f:
-        return json.load(f)
+    # Karena kita gak nyimpen ke file, langsung return struktur kosong
+    return {
+        "fish_types": [],
+        "mutation_types": []
+    }
 
-def save_data(data):
+# def save_data(data):
     # Buat direktori jika belum ada (untuk memastikan path-nya aman)
-    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
-    with open(DATA_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+#     os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+#     with open(DATA_FILE, "w") as f:
+#         json.dump(data, f, indent=4)
 
 # --- Inisialisasi Data ke Session State ---
 if 'data' not in st.session_state:
@@ -38,7 +36,7 @@ def add_fish(name, leverage):
     if name and leverage is not None:
         if not any(f['name'].lower() == name.lower() for f in st.session_state.data['fish_types']):
             st.session_state.data['fish_types'].append({"name": name, "leverage": leverage})
-            save_data(st.session_state.data)
+            # save_data(st.session_state.data)
             return {"type": "success", "content": f"Jenis ikan <span style='color: #FFD700;'>{name}</span> berhasil ditambahkan!"}
         else:
             return {"type": "warning", "content": f"Jenis ikan <span style='color: orange;'>{name}</span> sudah ada."}
@@ -54,7 +52,7 @@ def update_fish(old_name, new_name, new_leverage):
         for i, fish in enumerate(st.session_state.data['fish_types']):
             if fish['name'] == old_name:
                 st.session_state.data['fish_types'][i] = {"name": new_name, "leverage": new_leverage}
-                save_data(st.session_state.data)
+                # save_data(st.session_state.data)
                 found = True
                 return {"type": "success", "content": f"Ikan <span style='color: #FFD700;'>{new_name}</span> berhasil diupdate"}
         if not found:
@@ -66,7 +64,7 @@ def delete_fish(name):
     initial_len = len(st.session_state.data['fish_types'])
     st.session_state.data['fish_types'] = [f for f in st.session_state.data['fish_types'] if f['name'] != name]
     if len(st.session_state.data['fish_types']) < initial_len:
-        save_data(st.session_state.data)
+        # save_data(st.session_state.data)
         return {"type": "success", "content": f"Ikan <span style='color: #FFD700;'>{name}</span> berhasil dihapus!"}
     else:
         return {"type": "warning", "content": f"Ikan <span style='color: orange;'>{name}</span> ga ada lol :)"}
@@ -76,7 +74,7 @@ def add_mutation(name, leverage):
     if name and leverage is not None:
         if not any(m['name'].lower() == name.lower() for m in st.session_state.data['mutation_types']):
             st.session_state.data['mutation_types'].append({"name": name, "leverage": leverage})
-            save_data(st.session_state.data)
+            # save_data(st.session_state.data)
             return {"type": "success", "content": f"Jenis mutasi **{name}** berhasil ditambahkan!"}
         else:
             return {"type": "warning", "content": f"Jenis mutasi **{name}** sudah ada."}
@@ -92,7 +90,7 @@ def update_mutation(old_name, new_name, new_leverage):
         for i, mut in enumerate(st.session_state.data['mutation_types']):
             if mut['name'] == old_name:
                 st.session_state.data['mutation_types'][i] = {"name": new_name, "leverage": new_leverage}
-                save_data(st.session_state.data)
+                # save_data(st.session_state.data)
                 found = True
                 return {"type": "success", "content": f"Mutasi **{old_name}** berhasil diupdate menjadi ***{new_name}***."}
         if not found:
@@ -104,7 +102,7 @@ def delete_mutation(name):
     initial_len = len(st.session_state.data['mutation_types'])
     st.session_state.data['mutation_types'] = [m for m in st.session_state.data['mutation_types'] if m['name'] != name]
     if len(st.session_state.data['mutation_types']) < initial_len:
-        save_data(st.session_state.data)
+        # save_data(st.session_state.data)
         return {"type": "success", "content": f"Mutasi **{name}** berhasil dihapus!"}
     else:
         return {"type": "warning", "content": f"Mutasi **{name}** ga ada lol :)"}
