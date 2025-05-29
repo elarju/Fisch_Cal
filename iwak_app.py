@@ -11,15 +11,28 @@ st.set_page_config(
 )
 
 # --- Nama File Database (JSON) ---
-# DATA_FILE = "iwak_data.json"
+DATA_FILE = "iwak_data.json"
 
 # --- Fungsi untuk Memuat dan Menyimpan Data ---
 def load_data():
-    # Karena kita gak nyimpen ke file, langsung return struktur kosong
-    return {
-        "fish_types": [],
-        "mutation_types": []
-    }
+    if not os.path.exists(DATA_FILE):
+        # Jika file tidak ditemukan (misal: di dev lokal baru pertama kali jalan)
+        # Buat struktur kosong, atau bisa juga raise error kalau mau strict
+        st.error(f"Error: File data '{DATA_FILE}' tidak ditemukan di server.")
+        # st.stop() # Ini bisa menghentikan aplikasi kalau file wajib ada
+        return {
+            "fish_types": [],
+            "mutation_types": []
+        }
+    try:
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        st.error(f"Error: File '{DATA_FILE}' rusak atau tidak valid JSON.")
+        return {
+            "fish_types": [],
+            "mutation_types": []
+        }
 
 # def save_data(data):
     # Buat direktori jika belum ada (untuk memastikan path-nya aman)
