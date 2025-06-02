@@ -11,7 +11,7 @@ st.set_page_config(
 )
 
 # --- Nama File Database (JSON) ---
-DATA_FILE = "D:/Iwak/app/iwak_data.json"
+DATA_FILE = "iwak_data.json"
 
 # --- Fungsi untuk Memuat dan Menyimpan Data ---
 def load_data():
