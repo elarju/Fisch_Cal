@@ -11,45 +11,34 @@ st.set_page_config(
 )
 
 # --- Nama File Database (JSON) ---
-DATA_FILE = "iwak_data.json"
+DATA_FILE = "D:/Iwak/app/iwak_data.json"
 
 # --- Fungsi untuk Memuat dan Menyimpan Data ---
 def load_data():
     if not os.path.exists(DATA_FILE):
-        # Jika file tidak ditemukan (misal: di dev lokal baru pertama kali jalan)
-        # Buat struktur kosong, atau bisa juga raise error kalau mau strict
-        st.error(f"Error: File data '{DATA_FILE}' tidak ditemukan di server.")
-        # st.stop() # Ini bisa menghentikan aplikasi kalau file wajib ada
         return {
             "fish_types": [],
             "mutation_types": []
         }
-    try:
-        with open(DATA_FILE, "r") as f:
-            return json.load(f)
-    except json.JSONDecodeError:
-        st.error(f"Error: File '{DATA_FILE}' rusak atau tidak valid JSON.")
-        return {
-            "fish_types": [],
-            "mutation_types": []
-        }
+    with open(DATA_FILE, "r") as f:
+        return json.load(f)
 
-# def save_data(data):
+def save_data(data):
     # Buat direktori jika belum ada (untuk memastikan path-nya aman)
-#     os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
-#     with open(DATA_FILE, "w") as f:
-#         json.dump(data, f, indent=4)
+    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f, indent=4)
 
 # --- Inisialisasi Data ke Session State ---
 if 'data' not in st.session_state:
     st.session_state.data = load_data()
 
-# --- Fungsi CRUD untuk Jenis Ikan ---
+# --- Fungsi CRUD untuk Jenis Ikan (Tetap ada fungsinya, cuma formnya aja yang diilangin) ---
 def add_fish(name, leverage):
     if name and leverage is not None:
         if not any(f['name'].lower() == name.lower() for f in st.session_state.data['fish_types']):
             st.session_state.data['fish_types'].append({"name": name, "leverage": leverage})
-            # save_data(st.session_state.data)
+            save_data(st.session_state.data)
             return {"type": "success", "content": f"Jenis ikan <span style='color: #FFD700;'>{name}</span> berhasil ditambahkan!"}
         else:
             return {"type": "warning", "content": f"Jenis ikan <span style='color: orange;'>{name}</span> sudah ada."}
@@ -65,7 +54,7 @@ def update_fish(old_name, new_name, new_leverage):
         for i, fish in enumerate(st.session_state.data['fish_types']):
             if fish['name'] == old_name:
                 st.session_state.data['fish_types'][i] = {"name": new_name, "leverage": new_leverage}
-                # save_data(st.session_state.data)
+                save_data(st.session_state.data)
                 found = True
                 return {"type": "success", "content": f"Ikan <span style='color: #FFD700;'>{new_name}</span> berhasil diupdate"}
         if not found:
@@ -77,17 +66,17 @@ def delete_fish(name):
     initial_len = len(st.session_state.data['fish_types'])
     st.session_state.data['fish_types'] = [f for f in st.session_state.data['fish_types'] if f['name'] != name]
     if len(st.session_state.data['fish_types']) < initial_len:
-        # save_data(st.session_state.data)
+        save_data(st.session_state.data)
         return {"type": "success", "content": f"Ikan <span style='color: #FFD700;'>{name}</span> berhasil dihapus!"}
     else:
         return {"type": "warning", "content": f"Ikan <span style='color: orange;'>{name}</span> ga ada lol :)"}
 
-# --- Fungsi CRUD untuk Jenis Mutasi ---
+# --- Fungsi CRUD untuk Jenis Mutasi (Tetap ada fungsinya, cuma formnya aja yang diilangin) ---
 def add_mutation(name, leverage):
     if name and leverage is not None:
         if not any(m['name'].lower() == name.lower() for m in st.session_state.data['mutation_types']):
             st.session_state.data['mutation_types'].append({"name": name, "leverage": leverage})
-            # save_data(st.session_state.data)
+            save_data(st.session_state.data)
             return {"type": "success", "content": f"Jenis mutasi **{name}** berhasil ditambahkan!"}
         else:
             return {"type": "warning", "content": f"Jenis mutasi **{name}** sudah ada."}
@@ -103,7 +92,7 @@ def update_mutation(old_name, new_name, new_leverage):
         for i, mut in enumerate(st.session_state.data['mutation_types']):
             if mut['name'] == old_name:
                 st.session_state.data['mutation_types'][i] = {"name": new_name, "leverage": new_leverage}
-                # save_data(st.session_state.data)
+                save_data(st.session_state.data)
                 found = True
                 return {"type": "success", "content": f"Mutasi **{old_name}** berhasil diupdate menjadi ***{new_name}***."}
         if not found:
@@ -115,7 +104,7 @@ def delete_mutation(name):
     initial_len = len(st.session_state.data['mutation_types'])
     st.session_state.data['mutation_types'] = [m for m in st.session_state.data['mutation_types'] if m['name'] != name]
     if len(st.session_state.data['mutation_types']) < initial_len:
-        # save_data(st.session_state.data)
+        save_data(st.session_state.data)
         return {"type": "success", "content": f"Mutasi **{name}** berhasil dihapus!"}
     else:
         return {"type": "warning", "content": f"Mutasi **{name}** ga ada lol :)"}
@@ -129,7 +118,6 @@ st.markdown(
 )
 
 # --- Tabs (Pemisah Halaman) ---
-# Tambah 'Target Harga' di list tabs
 tab_calculator, tab_fish_mgmt, tab_mutation_mgmt, tab_target_price = st.tabs(
     ["Hitung Iwak", "Nama Iwak", "Mutasi", "Target Harga"]
 )
@@ -141,7 +129,8 @@ with tab_calculator:
         Nanti harga ikanmu langsung dihitung otomatis!
     """)
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # Kolom untuk Nama Iwak (Kiri Atas) dan Mutasi (Kanan Atas)
     col_fish_type, col_mutation = st.columns(2)
@@ -192,7 +181,8 @@ with tab_calculator:
                     leverage_mutasi = mut['leverage']
                     break
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # Bagian Atribut Shiny & Sparkling (di bawah, bersebelahan)
     st.markdown("##### ✨ Atribut Spesial (Opsional)")
@@ -215,7 +205,8 @@ with tab_calculator:
         )
         leverage_sparkling = LEVERAGE_SPARKLING_FIXED if is_sparkling else 1.0
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # --- Bagian Input Berat Iwak Dinamis & Hasil Per Iwak ---
     st.markdown("##### ⚖️ Masukkan Berat Iwak & Lihat Harga Per Item")
@@ -266,6 +257,7 @@ with tab_calculator:
                 )
                 prices_per_fish_for_total.append(final_price_per_fish) # Simpan untuk total nanti
 
+                # Format harga per ikan dengan pemisah ribuan (titik)
                 st.markdown(f"<div style='background-color: #333333; padding: 10px; border-radius: 5px; margin-top: 28px; text-align: center;'>"
                             f"<span style='color: #FFD700; font-weight: bold;'>{final_price_per_fish:,.0f} Coin</span></div>", 
                             unsafe_allow_html=True)
@@ -287,7 +279,8 @@ with tab_calculator:
             st.session_state.num_berat_inputs -= 1
             st.rerun() # Rerun agar input hilang
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # --- Kalkulasi TOTAL Harga (SEKARANG BENERAN DI BAWAH) ---
     st.header("💰 Estimasi Total Harga Iwakmu!")
@@ -299,6 +292,7 @@ with tab_calculator:
         if total_final_price == 0: # Jika semua berat 0 setelah filter
              st.warning("⚠️ Belum ada iwak yang dihitung. Masukkan berat iwak yang valid ya!")
         else:
+            # Format total harga dengan pemisah ribuan (titik)
             st.success(f"### 🎉 TOTAL HARGA SEMUA IWAK: **{total_final_price:,.0f} Coin** $")
     else:
         # Tampilkan pesan kalau belum memenuhi syarat untuk kalkulasi TOTAL
@@ -317,121 +311,21 @@ with tab_fish_mgmt:
     sorted_fish_types = sorted(st.session_state.data['fish_types'], key=lambda x: x['name'].lower())
     st.dataframe(sorted_fish_types, use_container_width=True)
 
-    st.write("---")
-
-    # --- Tambah Ikan ---
-    st.subheader("Tambah Ikan Baru")
-    message_placeholder_add_fish = st.empty() 
-
-    with st.form("add_fish_form"):
-        new_fish_name = st.text_input("Nama Ikan Baru")
-        new_fish_leverage = st.number_input(
-            "Base $/Kg nya berapa?",
-            min_value=0.1,
-            value=1.0,
-            step=0.05
-        )
-        add_fish_button = st.form_submit_button("Tambah Ikan")
-        if add_fish_button:
-            result_message = add_fish(new_fish_name, new_fish_leverage)
-            
-            if result_message["type"] == "success":
-                message_placeholder_add_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True) 
-            elif result_message["type"] == "warning":
-                message_placeholder_add_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True)
-            elif result_message["type"] == "error":
-                message_placeholder_add_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True)
-
-            time.sleep(2)
-            st.rerun()
-
-    st.write("---")
-
-    # --- Update Ikan ---
-    st.subheader("Ubah Nama Ikan")
-    message_placeholder_update_fish = st.empty()
-    # Mengurutkan opsi ikan untuk update
-    fish_to_update_options_raw = [f['name'] for f in st.session_state.data['fish_types']]
-    fish_to_update_options_raw.sort() # Mengurutkan secara abjad
-    fish_to_update_options = fish_to_update_options_raw
-    if not fish_to_update_options:
-        fish_to_update_options = ["Belum ada ikan"]
-
-    fish_to_update = st.selectbox(
-        "Pilih Ikan yang akan diubah",
-        fish_to_update_options,
-        key='update_fish_select',
-        disabled=(not st.session_state.data['fish_types'])
-    )
-    
-    current_fish = {"name": "", "leverage": 1.0}
-    if fish_to_update != "Belum ada ikan":
-        current_fish = next((f for f in st.session_state.data['fish_types'] if f['name'] == fish_to_update), {"name": "", "leverage": 1.0})
-
-    with st.form("update_fish_form"):
-        updated_fish_name = st.text_input(
-            "Nama Ikan Baru",
-            value=current_fish['name'],
-            key='updated_fish_name_input',
-            disabled=(not st.session_state.data['fish_types'])
-        )
-        updated_fish_leverage = st.number_input(
-            "Base $/Kg Baru",
-            min_value=0.1,
-            value=current_fish['leverage'],
-            step=0.05,
-            key='updated_fish_leverage_input',
-            disabled=(not st.session_state.data['fish_types'])
-        )
-        update_fish_button = st.form_submit_button("Ubah Ikan", disabled=(not st.session_state.data['fish_types']))
-        if update_fish_button:
-            result_message = update_fish(fish_to_update, updated_fish_name, updated_fish_leverage)
-            
-            if result_message["type"] == "success":
-                message_placeholder_update_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True) 
-            elif result_message["type"] == "warning":
-                message_placeholder_update_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True)
-            elif result_message["type"] == "error":
-                message_placeholder_update_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True)
-            
-            time.sleep(2)
-            st.rerun()
-
-    st.write("---")
-
-    # --- Hapus Ikan ---
-    st.subheader("Hapus Ikan")
-    message_placeholder_delete_fish = st.empty()
-    # Mengurutkan opsi ikan untuk hapus
-    fish_to_delete_options_raw = [f['name'] for f in st.session_state.data['fish_types']]
-    fish_to_delete_options_raw.sort() # Mengurutkan secara abjad
-    fish_to_delete_options = fish_to_delete_options_raw
-    if not fish_to_delete_options:
-        fish_to_delete_options = ["Belum ada ikan"]
-
-    fish_to_delete = st.selectbox(
-        "Pilih Ikan yang akan dihapus",
-        fish_to_delete_options,
-        key='delete_fish_select',
-        disabled=(not st.session_state.data['fish_types'])
-    )
-    delete_fish_button = st.button("Hapus", disabled=(not st.session_state.data['fish_types']))
-    if delete_fish_button:
-        result_message = delete_fish(fish_to_delete)
-        
-        if result_message["type"] == "success":
-            message_placeholder_delete_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True) 
-        elif result_message["type"] == "warning":
-            message_placeholder_delete_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True)
-        elif result_message["type"] == "error":
-            message_placeholder_delete_fish.markdown(f"<p style='color: #FFFFFF;'>{result_message['content']}</p>", unsafe_allow_html=True)
-            
-        time.sleep(2)
-        st.rerun()
+    # --- Hapus semua bagian Tambah, Update, Hapus ---
+    # GemiKan v2 sengaja biarkan bagian ini kosong, agar tidak ada form CUD
+    # st.write("---") 
+    # st.subheader("Tambah Ikan Baru")
+    # ... (form tambah ikan) ...
+    # st.write("---")
+    # st.subheader("Ubah Nama Ikan")
+    # ... (form ubah ikan) ...
+    # st.write("---")
+    # st.subheader("Hapus Ikan")
+    # ... (form hapus ikan) ...
 
 # --- Tab Manajemen Jenis Mutasi ---
 with tab_mutation_mgmt:
-    st.header("Manajemen Mutasi")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+    st.header("Manajemen Mutasi")
     st.write("Tambah, ubah, atau hapus jenis mutasi dan nilai leveragenya.")
 
     # Tampilkan Data Saat Ini
@@ -439,137 +333,43 @@ with tab_mutation_mgmt:
     sorted_mutation_types = sorted(st.session_state.data['mutation_types'], key=lambda x: x['name'].lower())
     st.dataframe(sorted_mutation_types, use_container_width=True)
 
-    st.write("---")
-
-    # --- Tambah Mutasi ---
-    st.subheader("Tambah Jenis Mutasi Baru")
-    message_placeholder_add_mutation = st.empty()
-    with st.form("add_mutation_form"):
-        new_mutation_name = st.text_input("Nama Mutasi Baru")
-        new_mutation_leverage = st.number_input(
-            "Leverage Mutasi Baru",
-            min_value=0.1,
-            value=1.0,
-            step=0.05
-        )
-        add_mutation_button = st.form_submit_button("Tambah Mutasi")
-        if add_mutation_button:
-            result_message = add_mutation(new_mutation_name, new_mutation_leverage)
-            
-            if result_message["type"] == "success":
-                message_placeholder_add_mutation.success(result_message["content"])
-            elif result_message["type"] == "warning":
-                message_placeholder_add_mutation.warning(result_message["content"])
-            elif result_message["type"] == "error":
-                message_placeholder_add_mutation.error(result_message["content"])
-
-            time.sleep(2)
-            st.rerun()
-
-    st.write("---")
-
-    # --- Update Mutasi ---
-    st.subheader("Ubah Jenis Mutasi")
-    message_placeholder_update_mutation = st.empty()
-    # Mengurutkan opsi mutasi untuk update
-    mutation_to_update_options_raw = [m['name'] for m in st.session_state.data['mutation_types']]
-    mutation_to_update_options_raw.sort() # Mengurutkan secara abjad
-    mutation_to_update_options = mutation_to_update_options_raw
-    if not mutation_to_update_options:
-        mutation_to_update_options = ["Belum ada mutasi"]
-
-    mutation_to_update = st.selectbox(
-        "Pilih Mutasi yang akan diubah",
-        mutation_to_update_options,
-        key='update_mutation_select',
-        disabled=(not st.session_state.data['mutation_types'])
-    )
-    current_mutation = {"name": "", "leverage": 1.0}
-    if mutation_to_update != "Belum ada mutasi":
-        current_mutation = next((m for m in st.session_state.data['mutation_types'] if m['name'] == mutation_to_update), {"name": "", "leverage": 1.0})
-
-    with st.form("update_mutation_form"):
-        updated_mutation_name = st.text_input(
-            "Nama Mutasi Baru",
-            value=current_mutation['name'],
-            key='updated_mutation_name_input',
-            disabled=(not st.session_state.data['mutation_types'])
-        )
-        updated_mutation_leverage = st.number_input(
-            "Leverage Mutasi Baru",
-            min_value=0.1,
-            value=current_mutation['leverage'],
-            step=0.05,
-            key='updated_mutation_leverage_input',
-            disabled=(not st.session_state.data['mutation_types'])
-        )
-        update_mutation_button = st.form_submit_button("Ubah Mutasi", disabled=(not st.session_state.data['mutation_types']))
-        if update_mutation_button:
-            result_message = update_mutation(mutation_to_update, updated_mutation_name, updated_mutation_leverage)
-            
-            if result_message["type"] == "success":
-                message_placeholder_update_mutation.success(result_message["content"])
-            elif result_message["type"] == "warning":
-                message_placeholder_update_mutation.warning(result_message["content"])
-            elif result_message["type"] == "error":
-                message_placeholder_update_mutation.error(result_message["content"])
-
-            time.sleep(2)
-            st.rerun()
-
-    st.write("---")
-
-    # --- Hapus Mutasi ---
-    st.subheader("Hapus Jenis Mutasi")
-    message_placeholder_delete_mutation = st.empty()
-    # Mengurutkan opsi mutasi untuk hapus
-    mutation_to_delete_options_raw = [m['name'] for m in st.session_state.data['mutation_types']]
-    mutation_to_delete_options_raw.sort() # Mengurutkan secara abjad
-    mutation_to_delete_options = mutation_to_delete_options_raw
-    if not mutation_to_delete_options:
-        mutation_to_delete_options = ["Belum ada mutasi"]
-
-    mutation_to_delete = st.selectbox(
-        "Pilih Mutasi yang akan dihapus",
-        mutation_to_delete_options,
-        key='delete_mutation_select',
-        disabled=(not st.session_state.data['mutation_types'])
-    )
-    delete_mutation_button = st.button("Hapus Mutasi", disabled=(not st.session_state.data['mutation_types']))
-    if delete_mutation_button:
-        result_message = delete_mutation(mutation_to_delete)
-        
-        if result_message["type"] == "success":
-            message_placeholder_delete_mutation.success(result_message["content"])
-        elif result_message["type"] == "warning":
-            message_placeholder_delete_mutation.warning(result_message["content"])
-        elif result_message["type"] == "error":
-            message_placeholder_delete_mutation.error(result_message["content"])
-            
-        time.sleep(2)
-        st.rerun()
+    # --- Hapus semua bagian Tambah, Update, Hapus ---
+    # GemiKan v2 sengaja biarkan bagian ini kosong, agar tidak ada form CUD
+    # st.write("---")
+    # st.subheader("Tambah Jenis Mutasi Baru")
+    # ... (form tambah mutasi) ...
+    # st.write("---")
+    # st.subheader("Ubah Jenis Mutasi")
+    # ... (form ubah mutasi) ...
+    # st.write("---")
+    # st.subheader("Hapus Jenis Mutasi")
+    # ... (form hapus mutasi) ...
 
 # --- Tab Target Harga (NEW) ---
 with tab_target_price:
     st.header("🎯 Cari Berat Iwak Idealmu Berdasarkan Harga Target!")
     st.markdown("""
-        Punya target harga koin tertentu? Masukkan targetmu di sini, pilih jenis ikan, mutasi, dan atribut spesial,
-        nanti GemiKan v2 hitungin berapa berat ikan yang ideal biar pas sama targetmu!
+        Punya target harga koin tertentu? Masukkan targetmu di sini (dalam satuan M, misal `2.5` = `2.500.000`),
+        pilih jenis ikan, mutasi, dan atribut spesial. Berat ideal iwak akan langsung muncul!
     """)
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # Input Harga Target
-    target_price = st.number_input(
-        "**Harga Target (Coin):**",
+    target_price_input = st.number_input( # Mengubah nama variabel untuk kejelasan
+        "**Target Coin:** (M)",
         min_value=0.0,
-        value=1000.0,
-        step=100.0,
-        format="%.0f",
-        help="Masukkan berapa total koin yang ingin kamu capai."
+        value=1.0, # Default 1.0 berarti 1.000.000
+        step=0.5,  # Step 0.1 berarti 100.000
+        format="%.1f",
+        help="Contoh: `2.5` = `2.500.000` Coin."
     )
+    # Mengalikan input dengan 1.000.000
+    target_price = target_price_input * 1_000_000 
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # Kolom untuk Nama Iwak (Kiri Atas) dan Mutasi (Kanan Atas) - Sama seperti tab Hitung Iwak
     col_fish_type_target, col_mutation_target = st.columns(2)
@@ -620,7 +420,8 @@ with tab_target_price:
                     leverage_mutasi_target = mut['leverage']
                     break
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     # Bagian Atribut Shiny & Sparkling (Opsional) - Sama seperti tab Hitung Iwak
     st.markdown("##### ✨ Atribut Spesial (Opsional)")
@@ -643,7 +444,8 @@ with tab_target_price:
         )
         leverage_sparkling_target = LEVERAGE_SPARKLING_FIXED if is_sparkling_target else 1.0
 
-    st.write("---")
+    # Mengurangi spasi dengan custom HTML hr
+    st.markdown("<hr style='margin: 0.5em 0;'>", unsafe_allow_html=True)
 
     st.header("⚖️ Berat Iwak Idealmu:")
 
@@ -659,6 +461,7 @@ with tab_target_price:
 
         if total_leverage > 0: # Hindari pembagian dengan nol
             ideal_weight = target_price / total_leverage
+            # Format berat ideal dengan pemisah ribuan (titik)
             st.success(f"### ✨ Berat Iwak Idealmu: **{ideal_weight:,.2f} kg**")
             st.info("Ini adalah berat **per satu ekor** iwak untuk mencapai harga target.")
         else:
