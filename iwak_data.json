@@ -43,6 +43,14 @@
         {
             "name": "Magician Narwhal",
             "leverage": 50.0
+        },
+        {
+            "name": "Typhoon Tailfin",
+            "leverage": 2.6
+        },
+        {
+            "name": "Twilight Tentaclefish",
+            "leverage": 17.3
         }
     ],
     "mutation_types": [
@@ -57,6 +65,10 @@
         {
             "name": "Chaotic",
             "leverage": 12.0
+        },
+        {
+            "name": "Electric Shock",
+            "leverage": 3.5
         }
     ]
 }
