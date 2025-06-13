@@ -51,6 +51,18 @@
         {
             "name": "Twilight Tentaclefish",
             "leverage": 17.3
+        },
+        {
+            "name": "Giant Seadevil",
+            "leverage": 1.8
+        },
+        {
+            "name": "Mosslurker",
+            "leverage": 1.5
+        },
+        {
+            "name": "Voidglow Ghostfish",
+            "leverage": 3.28
         }
     ],
     "mutation_types": [
